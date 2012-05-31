@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' >
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap.css">
+    <script type="text/javascript" src="/static/js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.js"></script>
+	{% block header_scripts %}{%endblock %}
+    <title>{% block title %}MMAnywhere{% endblock %}</title>
+  </head>
+
+  <body>
+	<div class="navbar">
+	  <div class="navbar-inner">
+		<div class="container">
+		  <ul class="nav">
+			<a class="brand" href="#">
+			  Micro-Manager Anywhere
+			</a>
+			<li><a href="{{ url_for('mm_app_core.index') }}">Acquisition</a></li>
+			<li><a href="{{ url_for('configurations.index') }}">Configurations</a></li>
+			<li><a href="{{ url_for('devices.index') }}">Devices</a></li>
+		  </ul>
+		</div>
+	  </div>
+	</div>    
+
+    <div class="container">
+		{% block container_content %}Container content goes here{% endblock %}
+    </div>
+		
+	<script>
+		{% block footer_scripts %}Footer scripts go here{% endblock %}
+    </script>
+	  
+  </body>
+</html>

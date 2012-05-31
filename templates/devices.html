@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}MMAnywhere - Devices{% endblock %}
+
+{% block container_content %}
+<div id="content">
+	<header class="jumbotron subhead" id="overview">
+		<h1>Devices</h1>
+	</header>
+
+	<div class="tabbable tabs-left">
+		<ul id="devTab" class="nav nav-tabs">
+		{% for device in devices %}
+		  <li class=""><a href="#dev-{{ device.deviceId }}" data-toggle="tab">{{ device.deviceLabel }}</a></li>
+		{% endfor %}
+		</ul>
+		<div class="tab-content">
+		{% for device in devices %}
+		  <div class="tab-pane" id="dev-{{ device.deviceId }}">
+			<h2>{{ device.deviceLabel }} - Properties</h2>
+			<ul id="devicePropertiesList" class="unstyled">
+			  {% for property in device.deviceProperties %}
+				<li>
+				<div><a href="{{ property.propertyUrl }}">{{ property.propertyLabel }}</a> [{{ property.propertyType }}]</div>
+				<form action="{{ property.propertyUrl }}" method="post">
+				  <input size="30" type="text" name="propVal" value="{{ property.propertyValue }}">
+				  <input type="submit" value="Set">
+				</form>
+				</li>
+			  {% endfor %}
+			</ul>
+			<h2>{{ device.deviceLabel }} - Commands</h2>
+			<ul id="deviceCommandsList" class="unstyled">
+			  {% for command in device.deviceCommands %}
+				<li>
+				<button class="btn dev-command" href="{{ command.commandUrl }}">{{ command.commandLabel }}</button>
+				</li>
+			  {% endfor %}
+			</ul>
+		  </div>
+		{% endfor %}
+	</div>
+{% endblock %}
+
+{% block footer_scripts %}
+	$(function () {
+		$('#devTab a:first').tab('show');
+		})
+	$(".dev-command").click(function (event) {
+		event.preventDefault();
+		window.open(event.target.attributes.href.value, 
+			"cmdWindow",
+			"menubar=1,resizable=1,width=550,height=550");
+		});
+
+{% endblock %}
+

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block header_scripts %}
+<script>
+    var serverUrl = "{{ url_for('mm_app_core.index') }}";
+</script>
+<script src="/static/js/acquisition.js"></script>
+<script src="/static/js/jquery.timer.js"></script>
+
+{% endblock %}
+
+{% block title %}MMAnywhere - Acquisition{% endblock %}
+
+{% block container_content %}
+<div class="container" id="content">
+	<header class="jumbotron subhead" id="overview">
+	<h1>Acquisition</h1>
+	</header>
+
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span3">
+				<form class="form-inline well">
+					<fieldset>
+						<legend>Camera Control</legend>
+						<div class="control-group">
+							<button class="btn btn-primary btn-large" id="btn-snap-image">Snap</button>
+							<button class="btn btn-large" id="btn-live-image"
+								data-toggle="button">Live (Alpha)</button>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="exposure-ms">Exposure [ms]</label>
+							<div class="controls">
+								<input type="text" class="input-mini" id="exposure-ms"
+									value="{{ mm_app_core.get_exposure() }}"></input>
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="binning">Binning</label>
+							<div class="controls">
+								<select id="binning" class="input-mini">
+								{% for allowed_bin_value in mm_app_core.get_allowed_binning_values() %}
+								{% if allowed_bin_value == mm_app_core.get_binning() %}
+									<option selected="selected">{{ allowed_bin_value }}</option> 
+								{% else %}
+									<option>{{ allowed_bin_value }}</option> 
+								{% endif %}
+								{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="active-shutter">Shutter</label>
+							<div class="controls">
+								<select id="active-shutter" class="input-medium">
+									{% for available_shutter in mm_app_core.get_available_shutters() %}
+										{% if available_shutter == mm_app_core.get_shutter() %}
+											<option selected="selected">{{ available_shutter }}</option> 
+										{% else %}
+											<option>{{ available_shutter }}</option>
+										{% endif %}
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="checkbox">
+								{% if mm_app_core.get_auto_shutter() %}
+									<input type="checkbox" id="auto-shutter" checked="checked" /> Auto shutter 
+								{% else %}
+									<input type="checkbox" id="auto-shutter" /> Auto shutter 
+								{% endif %}
+							</label> 
+							{% if mm_app_core.get_shutter_open() %}
+								<button class="btn btn-info" id="open-shutter">Close</button>
+							{% else %}
+								<button class="btn btn-info" id="open-shutter">Open</button>
+							{% endif %}
+						</div>
+					</fieldset>
+				</form>
+
+				<form class="form-inline well">
+					<fieldset>
+						<legend>Config Presets</legend>
+
+						{% for config in configurations %}
+						<div class="control-group">
+							<h3>{{ config.configGroupLabel }}</h3>
+							<div class="controls">
+								<div class="btn-group" id="cfg-$foreach.count">
+									<button class="btn">{{ config.currentPreset }}</button>
+									<button class="btn dropdown-toggle" data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										{% for preset in config.configGroupPresets %}
+										<li><a href="{{ config.configGroupUrl }}"
+											class="activate-preset" id="{{ preset.presetId }}">{{ preset.presetLabel }}</a>
+										</li> 
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+
+					</fieldset>
+				</form>
+			</div>
+
+			<div class="span8" id="acq-image-div">
+				<!--Body content-->
+				<img id="acq-image" src="/static/img/MMAnywhere.png"></img>
+			</div>
+		</div>
+	</div>
+
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+    $("#btn-snap-image").click(function (event) {
+        event.preventDefault();
+        runningLive = false;
+        $("#btn-live-image").toggleClass("active", false);
+        getLatestImage();
+      });
+
+    $('#btn-live-image').button();
+    $("#btn-live-image").click(function (event) {
+    	  event.preventDefault();
+    	  theButton = event.target;
+        if ($(theButton).is(".active")) {
+        	runningLive = false;
+        } else {
+        	runningLive = true;
+        	getLatestImage();
+        }
+      });
+
+    registerEnterKey("#exposure-ms");
+    $('#exposure-ms').blur(function() {
+      exposure = $(this).val();
+    	$.post("{{ url_for('mm_app_core.set_exposure') }}",
+    			{"exposure" : exposure},
+    			function (data) {
+    				  $('#exposure-ms').val(data);
+    		})
+    		.error(function() { alert("Unable to set exposure") });
+    	});
+    
+    registerEnterKey("#binning");
+    $("#binning").change(function () {
+        var binning = $(this).val();
+        $.post("{{ url_for('mm_app_core.set_binning') }}",
+            {"binning" : binning},
+            function (data) {
+                $('#binning').val(data);
+          })
+          .error(function() { alert("Unable to set binning") });
+        });
+    
+    registerEnterKey("#active-shutter");
+    $("#active-shutter").change(function () {
+        var shutter = $(this).val();
+        $.post("{{ url_for('mm_app_core.set_active_shutter') }}",
+            {"active-shutter" : shutter},
+            function (data) {
+                $('#active-shutter').val(data);
+          })
+          .error(function() { alert("Unable to set active-shutter") });
+        });
+
+    $('#open-shutter').button();
+    $("#open-shutter").click(function (event) {
+        event.preventDefault();
+        theButton = event.target;
+        openShutter = false;
+	      if ($(theButton).text() == "Open") {
+        	openShutter = true;
+        }
+
+        $.post('{{ url_for('mm_app_core.set_shutter_open') }}',
+            {"open-shutter" : openShutter},
+            function (shutterIsOpen) {
+              shutterIsOpen = (shutterIsOpen == "True");
+              btnText = "Open";
+              if (shutterIsOpen) {
+            	  btnText = "Close";
+              }
+              $('#open-shutter').text(btnText);
+          })
+          .error(function() { alert("Error with open-shutter") });
+        });
+
+    registerEnterKey("#auto-shutter");
+    $("#auto-shutter").click(function () {
+        var autoshutter = $(this).is(':checked');
+        $.post('{{ url_for('mm_app_core.set_auto_shutter') }}',
+            {"auto-shutter" : autoshutter},
+            function (data) {
+                $('#auto-shutter').val(data);
+          })
+          .error(function() { alert("Unable to set auto-shutter") });
+        });
+
+    $(".activate-preset").click(function(event) {
+        event.preventDefault();
+        setToText = event.target.text;
+        setToItem = $(event.target).parent().parent().prev().prev();
+        $.post(event.target.href, { value: event.target.id})   
+          .success(function() {
+            setToItem.html(setToText); 
+          });
+
+      });
+{% endblock %}
