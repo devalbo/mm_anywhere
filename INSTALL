@@ -1,0 +1,21 @@
+
+Micro-Manager Installation Instructions
+
+Windows
+These Windows installation instructions assume Micro-Manager 1.4 is installed.
+- Download MMAnywhere from https://github.com/devalbo/mm_anywhere
+- Install Python 2.7 from http://www.python.org
+- Install flask according to http://flask.pocoo.org/docs/installation/#installation
+  - Install pip according to http://flask.pocoo.org/docs/installation/#windows-easy-install
+  - Then, run "pip install flask" from the command prompt
+- Install numpy for Python 2.7 (http://sourceforge.net/projects/numpy/)
+- Install matplotlib for Python 2.7 (http://sourceforge.net/projects/matplotlib/files/matplotlib/)
+- To configure, edit settings.py file in mm_anywhere directory
+- To start, run the command "python mm_anywhere.py" in mm_anywhere directory
+- To connect, open a web-browser on the same machine and navigate to http://localhost:5000
+
+Mac OSX
+* When trying to use Python with Micro-Manager on Mac OSX, I get an error similar to that described here: http://micro-manager.3463995.n2.nabble.com/Python-help-td6519456.html . Any help with this would be greatly appreciated.
+
+Linux
+* MMAnywhere has not been tested on Linux yet.
