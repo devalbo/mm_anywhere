@@ -1,0 +1,3 @@
+To turn the Python code into a Windows .exe file, you must have py2exe installed on your system. Run the command "python setup.py py2exe". It will put the stuff to be installed in the "dist" subdirectory.
+
+Once there is content in the "dist" directory, run the mm_anywhere_installer.nsi NSIS script (using NSIS). This will bundle the contents of the "dist" directory into the installer file named MMAnywhere-installer.exe.
