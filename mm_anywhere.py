@@ -11,6 +11,7 @@ This module supports starts the MMAnywhere service.
 
 # initialize Micro-Manager
 import sys, os, settings
+
 cwd = os.getcwd()
 os.chdir(settings.MM_DIR)
 sys.path.append(settings.MM_DIR)
