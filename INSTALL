@@ -1,7 +1,17 @@
-
 Micro-Manager Installation Instructions
 
-Windows
+Windows - Using the Installer
+
+To get up and running, perform the following steps:
+* Download and install 32-bit Windows MicroManager from http://valelab.ucsf.edu/~MM/MMwiki/index.php/Download_Micro-Manager_Latest_Release
+* Configure some demo hardware for MicroManager, making note of the configuration file you are using
+* Download MMAnywhere-installer.exe from https://github.com/devalbo/mm_anywhere
+* Install MMAnywhere (preferably in a user directory, so it doesn't have issues with permissions when saving images)
+* In the MMAnywhere installation directory, edit the mm_anywhere.ini file
+  - likely, you will only have to change the MM_DIR and SYSTEM_CONFIGURATION entries
+* From the Start menu, select Run MMAnywhere, then open a web-browser and navigate to http://localhost:5000/
+
+Windows - Doing Development
 These Windows installation instructions assume Micro-Manager 1.4 is installed.
 - Download MMAnywhere from https://github.com/devalbo/mm_anywhere
 - Install Python 2.7 from http://www.python.org
